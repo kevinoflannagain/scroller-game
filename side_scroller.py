@@ -33,9 +33,7 @@ class Player(object):
         self.y = y
         self.width = width
         self.height = height
-        self.hitbox = (self.x , self.y, self.width, 36)
-
-  
+        self.hitbox = (self.x , self.y, self.width, self.height)
 
     # def handle_bullets(self, bullets, enemies):
     #     for bullet in bullets:
@@ -58,11 +56,13 @@ class Player(object):
             self.y += VEL
         self.hitbox = (self.x , self.y, self.width, self.height)
 
-
-    def draw(self, win, keys_pressed, bullets):
+    def draw(self, win, keys_pressed):
         self.handle_movement(keys_pressed)
         win.blit(self.ship, (self.x,self.y))
-        pygame.draw.rect(win, (255,0,0), self.hitbox,2)
+        # pygame.draw.rect(win, (255,0,0), self.hitbox,2)
+    
+    def hit(self):
+        pass
 
 
 
@@ -72,7 +72,7 @@ class Enemy(object):
         self.width = width
         self.height = height
         self.x = W - 100
-        self.y = randint(0 + 50, H - 50)
+        self.y = randint(0 + 100, H - 100)
         self.speed = 0
         self.damage = 1
         self.hp = 3
@@ -91,22 +91,8 @@ class Enemy(object):
         #         self.runCount = 0
         if self.visible:
             win.blit(self.enemy_ship, (self.x,self.y))
-            pygame.draw.rect(win, (255,0,0), self.hitbox,2)
-
-
-    def move(self):
-        if self.vel > 0:
-            if self.x + self.vel < self.path[1]:
-                self.x += self.vel
-            else:
-                self.vel = self.vel * -1
-                self.walkCount = 0
-        else:
-            if self.x - self.vel > self.path[0]:
-                self.x += self.vel
-            else:
-                self.vel = self.vel * -1
-                self.walkCount = 0
+            self.hitbox = (self.x , self.y, self.width, 36)
+            # pygame.draw.rect(win, (255,0,0), self.hitbox,2)
 
     def move(self):
         if self.vel > 0:
@@ -129,7 +115,18 @@ class Enemy(object):
             self.visible = False
         print('hit')
     
-    
+# def move_lasers(self, vel, objs):
+#     self.cooldown()
+#     for laser in self.lasers:
+#         laser.move(vel)
+#         if laser.off_screen(HEIGHT):
+#             self.lasers.remove(laser)
+#         else:
+#             for obj in objs:
+#                 if laser.collision(obj):
+#                     objs.remove(obj)
+#                     if laser in self.lasers:
+#                         self.lasers.remove(laser)
 
 class projectile(object):
     def __init__(self, x, y, radius, color, facing):
@@ -153,7 +150,7 @@ def redrawWindow(bullets):
     win.blit(bg, (bgX2,0))
     keys_pressed = pygame.key.get_pressed()
 
-    player.draw(win, keys_pressed, bullets)
+    player.draw(win, keys_pressed)
     enemy.draw(win)
     for bullet in bullets:
         # pygame.draw.rect(win, RED, bullet)
@@ -177,6 +174,13 @@ while run:
     if bgX2 < bg.get_width() * -1:
         bgX2 = bg.get_width()
 
+    # if len(enemies) == 0:
+    #     level += 1
+    #     wave_length += 5
+    #     for i in range(wave_length):
+    #         enemy = Enemy(random.randrange(50, WIDTH-100), random.randrange(-1500, -100), random.choice(["red", "blue", "green"]))
+    #         enemies.append(enemy)
+
     for event in pygame.event.get():  # Loop through a list of events
         if event.type == pygame.QUIT:  # See if the user clicks the red x 
             run = False    # End the loop
@@ -199,10 +203,11 @@ while run:
 
 
     for bullet in bullets:
-        if bullet.y < enemy.hitbox[1] + enemy.hitbox[3] and bullet.y > enemy.hitbox[1]:
-            if bullet.x > enemy.hitbox[0] and bullet.x < enemy.hitbox[0] + enemy.hitbox[2]:
-                bullets.pop(bullets.index(bullet))
-                enemy.hit()
+        if enemy.visible:
+            if bullet.y < enemy.hitbox[1] + enemy.hitbox[3] and bullet.y > enemy.hitbox[1]:
+                if bullet.x > enemy.hitbox[0] and bullet.x < enemy.hitbox[0] + enemy.hitbox[2]:
+                    bullets.pop(bullets.index(bullet))
+                    enemy.hit()
                 
         if bullet.x < W and bullet.x > 0:
             bullet.x += bullet.vel
@@ -213,3 +218,20 @@ while run:
 
     clock.tick(speed)
 
+# def main_menu():
+#     title_font = pygame.font.SysFont("comicsans", 70)
+#     run = True
+#     while run:
+#         WIN.blit(BG, (0,0))
+#         title_label = title_font.render("Press the mouse to begin...", 1, (255,255,255))
+#         WIN.blit(title_label, (WIDTH/2 - title_label.get_width()/2, 350))
+#         pygame.display.update()
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 run = False
+#             if event.type == pygame.MOUSEBUTTONDOWN:
+#                 main()
+#     pygame.quit()
+
+
+# main_menu()
