@@ -11,7 +11,7 @@ W, H = 1500, 800
 win = pygame.display.set_mode((W,H))
 pygame.display.set_caption('Side Scroller')
 
-bg = pygame.image.load(os.path.join('side-scroller-game\images','game_background_1.png')).convert()
+bg = pygame.image.load(os.path.join('scroller-game\images','game_background_1.png')).convert()
 bgX = 0
 bgX2 = bg.get_width()
 
@@ -26,24 +26,26 @@ BG_SPEED = 1.4
 bullets = []
 class Player(object):
     # run = [pygame.image.load(os.path.join('side-scroller-game\images', str(x) + '.png')) for x in range(8,16)]
-    ship = pygame.image.load(os.path.join('side-scroller-game\images', 'transparant_ship.png'))
+    ship = pygame.image.load(os.path.join('scroller-game\images', 'transparant_ship.png'))
     
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+        self.hitbox = (self.x , self.y, self.width, 36)
+
   
 
-    def handle_bullets(self, bullets, enemies):
-        for bullet in bullets:
-            bullet.x += BULLET_VEL
-            # for enemy in enemies:
-            # if enemy.colliderect(bullet):
-            #     pygame.event.post(pygame.event.Event(enemy_HIT))
-            #     bullets.remove(bullet)
-            if bullet.x > W:
-                bullets.remove(bullet)
+    # def handle_bullets(self, bullets, enemies):
+    #     for bullet in bullets:
+    #         bullet.x += BULLET_VEL
+    #         # for enemy in enemies:
+    #         # if enemy.colliderect(bullet):
+    #         #     pygame.event.post(pygame.event.Event(enemy_HIT))
+    #         #     bullets.remove(bullet)
+    #         if bullet.x > W:
+    #             bullets.remove(bullet)
     
     def handle_movement(self, keys_pressed):
         if keys_pressed[pygame.K_a] and self.x - VEL > 0:            # left
@@ -54,31 +56,30 @@ class Player(object):
             self.y -= VEL
         if keys_pressed[pygame.K_s] and self.y + VEL + self.height < H - 15:            # down
             self.y += VEL
+        self.hitbox = (self.x , self.y, self.width, self.height)
+
 
     def draw(self, win, keys_pressed, bullets):
         self.handle_movement(keys_pressed)
-        # self.handle_bullets(bullets)
-
-            
-        # else:
-        #     if self.runCount > 42:
-        #         self.runCount = 0
         win.blit(self.ship, (self.x,self.y))
-            # self.runCount += 1
+        pygame.draw.rect(win, (255,0,0), self.hitbox,2)
+
 
 
 class Enemy(object):
-    enemy_ship = pygame.image.load(os.path.join('side-scroller-game\images', 'enemy1.png'))
+    enemy_ship = pygame.image.load(os.path.join('scroller-game\images', 'enemy1.png'))
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.x = W + 50
+        self.x = W - 100
         self.y = randint(0 + 50, H - 50)
         self.speed = 0
         self.damage = 1
         self.hp = 3
         self.vel = 3
         self.drop = None
+        self.hitbox = (self.x , self.y, self.width, 36)
+        self.visible = True
 
     def draw(self, win):
         # self.handle_movement(keys_pressed)
@@ -88,7 +89,10 @@ class Enemy(object):
         # else:
         #     if self.runCount > 42:
         #         self.runCount = 0
-        win.blit(self.enemy_ship, (self.x,self.y))
+        if self.visible:
+            win.blit(self.enemy_ship, (self.x,self.y))
+            pygame.draw.rect(win, (255,0,0), self.hitbox,2)
+
 
     def move(self):
         if self.vel > 0:
@@ -117,6 +121,13 @@ class Enemy(object):
             else:
                 self.vel = self.vel * -1
                 self.walkCount = 0
+    
+    def hit(self):
+        if self.hp > 0:
+            self.hp -= 1
+        else:
+            self.visible = False
+        print('hit')
     
     
 
@@ -135,7 +146,6 @@ class projectile(object):
             pygame.draw.rect(win, RED, bullet_rect)
         else:
             pygame.draw.circle(win, self.color, (self.x,self.y), self.radius)
-        # print(bullets)
 
 
 def redrawWindow(bullets):
@@ -154,7 +164,7 @@ def redrawWindow(bullets):
 
 
 player = Player(200, H-100, 64, 64)
-enemy = Enemy(81, 69)
+enemy = Enemy(50, 36)
 pygame.time.set_timer(USEREVENT+1,500)
 speed = 80
 run = True
@@ -184,16 +194,15 @@ while run:
     if keys_pressed[pygame.K_SPACE]:
         if current_time - previous_time > 150:
             previous_time = current_time
-            bullets.append(projectile(round(player.x + player.width/2), round(player.y + player.height/2), 5, ORANGE, 1))
-            # bullets.append(projectile(round(player.x + player.width/2), round(player.y + player.height/2), -1, RED, 1))
+            # bullets.append(projectile(round(player.x + player.width/2), round(player.y + player.height/2), 5, ORANGE, 1))
+            bullets.append(projectile(round(player.x + player.width/2), round(player.y + player.height/2), -1, RED, 1))
 
 
     for bullet in bullets:
-        # if bullet.y - bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
-        #     if bullet.x + bullet.radius > goblin.hitbox[0] and bullet.x - bullet.radius < goblin.hitbox[0] + goblin.hitbox[2]:
-        #         goblin.hit()
-        #         score += 1
-        #         bullets.pop(bullets.index(bullet))
+        if bullet.y < enemy.hitbox[1] + enemy.hitbox[3] and bullet.y > enemy.hitbox[1]:
+            if bullet.x > enemy.hitbox[0] and bullet.x < enemy.hitbox[0] + enemy.hitbox[2]:
+                bullets.pop(bullets.index(bullet))
+                enemy.hit()
                 
         if bullet.x < W and bullet.x > 0:
             bullet.x += bullet.vel
