@@ -18,7 +18,7 @@ bgX2 = bg.get_width()
 clock = pygame.time.Clock()
 
 VEL = 5
-BULLET_VEL = 10
+BULLET_VEL = 13
 RED = (255, 0, 0)
 GREEN = (0,100,0)
 ORANGE = (255,165,0)
@@ -72,41 +72,38 @@ class Enemy(object):
         self.width = width
         self.height = height
         self.x = W - 100
-        self.y = randint(0 + 100, H - 100)
+        self.y = 100#randint(0 + 100, H - 100)
         self.speed = 0
         self.damage = 1
         self.hp = 3
-        self.vel = 3
+        self.vel = 2
         self.drop = None
         self.hitbox = (self.x , self.y, self.width, 36)
         self.visible = True
+        self.x_end = W - 100
+        self.y_end = H - 100
+        self.path = [self.x, self.y, self.x_end, self.y_end]
 
-    def draw(self, win):
-        # self.handle_movement(keys_pressed)
-        # self.handle_bullets(bullets)
-
-            
-        # else:
-        #     if self.runCount > 42:
-        #         self.runCount = 0
+    def draw(self, win):        
         if self.visible:
+            self.move()
             win.blit(self.enemy_ship, (self.x,self.y))
             self.hitbox = (self.x , self.y, self.width, 36)
             # pygame.draw.rect(win, (255,0,0), self.hitbox,2)
 
     def move(self):
         if self.vel > 0:
-            if self.x + self.vel < self.path[1]:
-                self.x += self.vel
+            if self.y + self.vel < self.path[3]:
+                self.y += self.vel
             else:
                 self.vel = self.vel * -1
-                self.walkCount = 0
+                
         else:
-            if self.x - self.vel > self.path[0]:
-                self.x += self.vel
+            if self.y - self.vel > self.path[1]:
+                self.y += self.vel
             else:
                 self.vel = self.vel * -1
-                self.walkCount = 0
+                
     
     def hit(self):
         if self.hp > 0:
@@ -135,7 +132,7 @@ class projectile(object):
         self.radius = radius
         self.color = color
         self.facing = facing
-        self.vel = 8 * facing
+        self.vel = BULLET_VEL * facing
 
     def draw(self,win):
         if self.radius == -1:
@@ -186,13 +183,9 @@ while run:
             run = False    # End the loop
             pygame.quit()  # Quit the game
             quit()
-        # if event.type == USEREVENT+1:
-        #     speed +=1
-
-        
+   
 
     current_time = pygame.time.get_ticks()
-
     keys_pressed = pygame.key.get_pressed()
     
     if keys_pressed[pygame.K_SPACE]:
