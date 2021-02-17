@@ -17,7 +17,7 @@ bgX2 = bg.get_width()
 
 clock = pygame.time.Clock()
 
-VEL = 5
+VEL = 6
 BULLET_VEL = 13
 RED = (255, 0, 0)
 GREEN = (0,100,0)
@@ -194,6 +194,8 @@ while run:
             # bullets.append(projectile(round(player.x + player.width/2), round(player.y + player.height/2), 5, ORANGE, 1))
             bullets.append(projectile(round(player.x + player.width/2), round(player.y + player.height/2), -1, RED, 1))
 
+    if abs(enemy.y - player.y) < 50 and enemy.visible:
+        bullets.append(projectile(round(enemy.x + enemy.width/2 - 25), round(enemy.y + enemy.height/2), 5, ORANGE, -1))
 
     for bullet in bullets:
         if enemy.visible:
