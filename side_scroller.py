@@ -23,6 +23,7 @@ RED = (255, 0, 0)
 GREEN = (0,100,0)
 ORANGE = (255,165,0)
 BG_SPEED = 1.4
+RELOAD = 150
 bullets = []
 class Player(object):
     # run = [pygame.image.load(os.path.join('side-scroller-game\images', str(x) + '.png')) for x in range(8,16)]
@@ -31,20 +32,11 @@ class Player(object):
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
+        self.hp = 10
         self.width = width
         self.height = height
         self.hitbox = (self.x , self.y, self.width, self.height)
 
-    # def handle_bullets(self, bullets, enemies):
-    #     for bullet in bullets:
-    #         bullet.x += BULLET_VEL
-    #         # for enemy in enemies:
-    #         # if enemy.colliderect(bullet):
-    #         #     pygame.event.post(pygame.event.Event(enemy_HIT))
-    #         #     bullets.remove(bullet)
-    #         if bullet.x > W:
-    #             bullets.remove(bullet)
-    
     def handle_movement(self, keys_pressed):
         if keys_pressed[pygame.K_a] and self.x - VEL > 0:            # left
             self.x -= VEL
@@ -62,7 +54,9 @@ class Player(object):
         # pygame.draw.rect(win, (255,0,0), self.hitbox,2)
     
     def hit(self):
-        pass
+        if self.hp > 0:
+            self.hp -= 1
+            print ("player hit")
 
 
 
@@ -78,7 +72,7 @@ class Enemy(object):
         self.hp = 3
         self.vel = 2
         self.drop = None
-        self.hitbox = (self.x , self.y, self.width, 36)
+        self.hitbox = (self.x , self.y, self.width, self.height)
         self.visible = True
         self.x_end = W - 100
         self.y_end = H - 100
@@ -121,7 +115,8 @@ class projectile(object):
         self.color = color
         self.facing = facing
         self.vel = BULLET_VEL * facing
-
+        self.damage = 1
+        
     def draw(self,win):
         if self.radius == -1:
             bullet_rect = pygame.Rect(self.x, self.y, 10, 5)
@@ -142,16 +137,15 @@ def redrawWindow(bullets):
         # pygame.draw.rect(win, RED, bullet)
         bullet.draw(win)
 
-
     pygame.display.update()
 
 enemies = []
 player = Player(200, H-100, 64, 64)
-# enemy = Enemy(50, 36)
 pygame.time.set_timer(USEREVENT+1,500)
 speed = 80
 run = True
 previous_time = pygame.time.get_ticks()
+prev_time = pygame.time.get_ticks()
 while run:
     bgX -= BG_SPEED
     bgX2 -= BG_SPEED
@@ -180,7 +174,6 @@ while run:
             pygame.quit()  # Quit the game
             quit()
    
-
     current_time = pygame.time.get_ticks()
     keys_pressed = pygame.key.get_pressed()
     
@@ -188,15 +181,18 @@ while run:
         if current_time - previous_time > 150:
             previous_time = current_time
             # bullets.append(projectile(round(player.x + player.width/2), round(player.y + player.height/2), 5, ORANGE, 1))
-            bullets.append(projectile(round(player.x + player.width/2), round(player.y + player.height/2), -1, RED, 1))
+            bullets.append(projectile(round(player.x + player.width/2 + 25), round(player.y + player.height/2), -1, RED, 1))
 
+    reload_time = pygame.time.get_ticks()
     
     for enemy in enemies:
         #enemy shoot if player in sights
-        if abs(enemy.y - player.y) < 50 and enemy.visible:
+        if abs(enemy.y - player.y) < 50 and enemy.visible and reload_time - prev_time > RELOAD:
+            prev_time = reload_time
             bullets.append(projectile(round(enemy.x + enemy.width/2 - 25), round(enemy.y + enemy.height/2), 5, ORANGE, -1))
 
         for bullet in bullets:
+            #enemy hit
             if enemy.visible:
                 if bullet.y < enemy.hitbox[1] + enemy.hitbox[3] and bullet.y > enemy.hitbox[1]:
                     if bullet.x > enemy.hitbox[0] and bullet.x < enemy.hitbox[0] + enemy.hitbox[2]:
@@ -207,9 +203,14 @@ while run:
                 bullet.x += bullet.vel
             else:
                 bullets.pop(bullets.index(bullet))            
-        
-        redrawWindow(bullets)
 
+            #player hit
+            if bullet.y < player.hitbox[1] + player.hitbox[3] and bullet.y > player.hitbox[1]:
+                    if bullet.x > player.hitbox[0] and bullet.x < player.hitbox[0] + player.hitbox[2]:
+                        bullets.pop(bullets.index(bullet))
+                        player.hit()
+
+        redrawWindow(bullets)
         clock.tick(speed)
 
 # def main_menu():
