@@ -164,7 +164,7 @@ while run:
         if event.type == pygame.QUIT:
             run = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            while run:
+            while run:                  #end of menu screen
                 bgX -= BG_SPEED
                 bgX2 -= BG_SPEED
                 if bgX < bg.get_width() * -1:
@@ -180,7 +180,7 @@ while run:
                     enemies.append(enemy)
                 
                 for event in pygame.event.get():  # Loop through a list of events
-                    if event.type == pygame.QUIT:  # See if the user clicks the red x 
+                    if event.type == pygame.QUIT:  # See if the user exits
                         run = False    # End the loop
                         pygame.quit()  # Quit the game
                         quit()
@@ -223,21 +223,3 @@ while run:
 
                     redrawWindow(bullets)
                     clock.tick(speed)
-
-# def main_menu():
-#     title_font = pygame.font.SysFont("comicsans", 70)
-#     run = True
-#     while run:
-#         win.blit(BG, (0,0))
-#         title_label = title_font.render("Press the mouse to begin...", 1, (255,255,255))
-#         win.blit(title_label, (W/2 - title_label.get_width()/2, 350))
-#         pygame.display.update()
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 run = False
-#             if event.type == pygame.MOUSEBUTTONDOWN:
-#                 main()
-#     pygame.quit()
-
-
-# main_menu()
