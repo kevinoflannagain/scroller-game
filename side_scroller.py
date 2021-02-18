@@ -22,8 +22,8 @@ BULLET_VEL = 13
 RED = (255, 0, 0)
 GREEN = (0,100,0)
 ORANGE = (255,165,0)
-BG_SPEED = 1.4
-RELOAD = 150
+BG_SPEED = 2
+RELOAD = 200
 bullets = []
 class Player(object):
     # run = [pygame.image.load(os.path.join('side-scroller-game\images', str(x) + '.png')) for x in range(8,16)]
