@@ -112,18 +112,6 @@ class Enemy(object):
             self.visible = False
         print('hit')
     
-# def move_lasers(self, vel, objs):
-#     self.cooldown()
-#     for laser in self.lasers:
-#         laser.move(vel)
-#         if laser.off_screen(HEIGHT):
-#             self.lasers.remove(laser)
-#         else:
-#             for obj in objs:
-#                 if laser.collision(obj):
-#                     objs.remove(obj)
-#                     if laser in self.lasers:
-#                         self.lasers.remove(laser)
 
 class projectile(object):
     def __init__(self, x, y, radius, color, facing):
@@ -217,9 +205,9 @@ while run:
 #     title_font = pygame.font.SysFont("comicsans", 70)
 #     run = True
 #     while run:
-#         WIN.blit(BG, (0,0))
+#         win.blit(BG, (0,0))
 #         title_label = title_font.render("Press the mouse to begin...", 1, (255,255,255))
-#         WIN.blit(title_label, (WIDTH/2 - title_label.get_width()/2, 350))
+#         win.blit(title_label, (W/2 - title_label.get_width()/2, 350))
 #         pygame.display.update()
 #         for event in pygame.event.get():
 #             if event.type == pygame.QUIT:
