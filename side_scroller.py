@@ -26,6 +26,8 @@ GREEN = (0,100,0)
 ORANGE = (255,105,0)
 BG_SPEED = 2
 RELOAD = 500
+SPAWN_COOLDOWN = 2000
+NO_ENEMIES = 3
 bullets = []
 
 #-------------------------------  player  -------------------------------#
@@ -63,7 +65,6 @@ class Player(object):
     def hit(self):
         if self.hp > 0:
             self.hp -= 1
-            print ("player hit")
     
     def healthbar(self, win):
         pygame.draw.rect(win, (255,0,0), (W/2 - 50, H-12, 100, 10))
@@ -116,7 +117,6 @@ class Enemy(object):
             self.hp -= 1
         else:
             self.visible = False
-        print('hit')
 
 
 #------------------------------- projectile -------------------------------#
@@ -139,6 +139,8 @@ class projectile(object):
             pygame.draw.circle(win, self.color, (self.x,self.y), self.radius)
 #--------------------------------------------------------------------------#
 
+def spawn():
+    pass
 
 def redrawWindow(bullets):
     win.blit(bg, (bgX,0))
@@ -154,12 +156,13 @@ def redrawWindow(bullets):
 
 
 
-enemies = []
+enemies = None
 player = Player(200, H-100, 64, 64)
 pygame.time.set_timer(USEREVENT+1,500)
-speed = 80
+speed = 60
 run = True
 previous_time = pygame.time.get_ticks()
+enemy_kill = pygame.time.get_ticks()
 prev_time = pygame.time.get_ticks()
 title_font = pygame.font.SysFont("comicsans", 70)
 instructions_font = pygame.font.SysFont("comicsans", 40)
@@ -177,7 +180,10 @@ while run:
         if event.type == pygame.QUIT:
             run = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            while run:                  #end of menu screen
+            #end of menu screen
+            while run:    
+                clock.tick(speed)
+                              
                 bgX -= BG_SPEED
                 bgX2 -= BG_SPEED
                 if bgX < bg.get_width() * -1:
@@ -185,26 +191,26 @@ while run:
                 if bgX2 < bg.get_width() * -1:
                     bgX2 = bg.get_width()
 
-                if len(enemies) < 3:
-                        # level += 1
-                        # wave_length += 5
-                        
-                    enemy = Enemy(50, 36)
-                    enemies.append(enemy)
+                if enemies is None:
+                    enemies = []
+                    for i in range(NO_ENEMIES):                        
+                        enemy = Enemy(50, 36)
+                        enemies.append(enemy)
                 
-                for event in pygame.event.get():  # Loop through a list of events
-                    if event.type == pygame.QUIT:  # See if the user exits
-                        run = False    # End the loop
-                        pygame.quit()  # Quit the game
+                for event in pygame.event.get():  
+                    if event.type == pygame.QUIT:  
+                        run = False    
+                        pygame.quit()  
                         quit()
             
                 current_time = pygame.time.get_ticks()
                 keys_pressed = pygame.key.get_pressed()
                 
+                #deal with player shooting
                 if keys_pressed[pygame.K_SPACE]:
                     if current_time - previous_time > 150:
                         previous_time = current_time
-                        bullets.append(projectile(round(player.x + player.width/2 + 25), round(player.y + player.height/2), -1, RED, 1, BULLET_VEL_PLAYER))
+                        bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2), -1, RED, 1, BULLET_VEL_PLAYER))
 
                 reload_time = pygame.time.get_ticks()
                 
@@ -215,32 +221,43 @@ while run:
                         bullets.append(projectile(round(enemy.x + enemy.width/2 - 25), round(enemy.y + enemy.height/2), 5, ORANGE, -1, BULLET_VEL_ENEMY))
 
                     for bullet in bullets:
-                        #enemy hit
+                        #check if enemy hit
                         if enemy.visible:
                             if bullet.y < enemy.hitbox[1] + enemy.hitbox[3] and bullet.y > enemy.hitbox[1]:
                                 if bullet.x > enemy.hitbox[0] and bullet.x < enemy.hitbox[0] + enemy.hitbox[2]:
                                     bullets.pop(bullets.index(bullet))
                                     enemy.hit()
-                                
-                        if bullet.x < W and bullet.x > 0:
-                            bullet.x += bullet.vel
-                        else:
-                            bullets.pop(bullets.index(bullet))            
+                        elif enemy in enemies:      
+                            enemies.pop(enemies.index(enemy))
+                            print (len(enemies))
+                            enemy_kill = pygame.time.get_ticks()      
 
-                        #player hit
+                        #check if player hit
                         if bullet.y < player.hitbox[1] + player.hitbox[3] and bullet.y > player.hitbox[1]:
                                 if bullet.x > player.hitbox[0] and bullet.x < player.hitbox[0] + player.hitbox[2]:
                                     bullets.pop(bullets.index(bullet))
                                     player.hit()
 
-                    if player.hp <= 0:
-                        win.blit(bg, (bgX,0))
-                        title_label = title_font.render("Game Over... Don't Get Hit LOL", 1, (255,255,255))
-                        win.blit(title_label, (W/2 - title_label.get_width()/2, 350))
-                        pygame.display.update()
-                        time.sleep(3)
-                        quit()
+                #deal with player healthbar
+                if player.hp <= 0:
+                    win.blit(bg, (bgX,0))
+                    win.blit(bg2, (bgX2,0))
+                    pygame.display.update()
+                    title_label = title_font.render("Game Over... Don't Get Hit LOL", 1, (255,255,255))
+                    win.blit(title_label, (W/2 - title_label.get_width()/2, 350))
+                    pygame.display.update()
+                    time.sleep(3)
+                    quit()
 
+                for bullet in bullets:
+                    #remove bullet if goes off screen        
+                    if bullet.x < W and bullet.x > 0:
+                        bullet.x += bullet.vel
+                    else:
+                        bullets.pop(bullets.index(bullet))
+                
 
-                    redrawWindow(bullets)
-                    clock.tick(speed)
+                if len(enemies) < 3 and pygame.time.get_ticks() - enemy_kill > SPAWN_COOLDOWN:
+                    enemy = Enemy(50, 36)
+                    enemies.append(enemy)
+                redrawWindow(bullets)
