@@ -25,6 +25,9 @@ ORANGE = (255,105,0)
 BG_SPEED = 2
 RELOAD = 200
 bullets = []
+
+#-------------------------------  player  -------------------------------#
+#------------------------------------------------------------------------#
 class Player(object):
     # run = [pygame.image.load(os.path.join('side-scroller-game\images', str(x) + '.png')) for x in range(8,16)]
     ship = pygame.image.load(os.path.join('scroller-game\images', 'transparant_ship.png'))
@@ -59,7 +62,8 @@ class Player(object):
             print ("player hit")
 
 
-
+#-------------------------------   enemy   -------------------------------#
+#-------------------------------------------------------------------------#
 class Enemy(object):
     enemy_ship = pygame.image.load(os.path.join('scroller-game\images', 'enemy1.png'))
     def __init__(self, width, height):
@@ -98,15 +102,16 @@ class Enemy(object):
             else:
                 self.vel = self.vel * -1
                 
-    
     def hit(self):
         if self.hp > 0:
             self.hp -= 1
         else:
             self.visible = False
         print('hit')
-    
 
+
+#------------------------------- projectile -------------------------------#
+#--------------------------------------------------------------------------#
 class projectile(object):
     def __init__(self, x, y, radius, color, facing):
         self.x = x
@@ -123,18 +128,17 @@ class projectile(object):
             pygame.draw.rect(win, RED, bullet_rect)
         else:
             pygame.draw.circle(win, self.color, (self.x,self.y), self.radius)
+#--------------------------------------------------------------------------#
 
 
 def redrawWindow(bullets):
     win.blit(bg, (bgX,0))
     win.blit(bg, (bgX2,0))
     keys_pressed = pygame.key.get_pressed()
-
     player.draw(win, keys_pressed)
     for enemy in enemies:
         enemy.draw(win)
     for bullet in bullets:
-        # pygame.draw.rect(win, RED, bullet)
         bullet.draw(win)
 
     pygame.display.update()
@@ -146,6 +150,8 @@ speed = 80
 run = True
 previous_time = pygame.time.get_ticks()
 prev_time = pygame.time.get_ticks()
+
+#------------------------------- main loop -------------------------------#
 while run:
     bgX -= BG_SPEED
     bgX2 -= BG_SPEED
@@ -153,13 +159,6 @@ while run:
         bgX = bg.get_width()    
     if bgX2 < bg.get_width() * -1:
         bgX2 = bg.get_width()
-
-    # if len(enemies) == 0:
-    #     level += 1
-    #     wave_length += 5
-    #     for i in range(wave_length):
-    #         enemy = Enemy(random.randrange(50, WIDTH-100), random.randrange(-1500, -100), random.choice(["red", "blue", "green"]))
-    #         enemies.append(enemy)
 
     if len(enemies) < 3:
             # level += 1
