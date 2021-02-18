@@ -37,7 +37,7 @@ class Player(object):
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
-        self.max_hp = 2
+        self.max_hp = 5
         self.hp = self.max_hp
         self.width = width
         self.height = height
@@ -64,8 +64,6 @@ class Player(object):
         if self.hp > 0:
             self.hp -= 1
             print ("player hit")
-        
-
     
     def healthbar(self, win):
         pygame.draw.rect(win, (255,0,0), (W/2 - 50, H-12, 100, 10))
@@ -154,6 +152,8 @@ def redrawWindow(bullets):
 
     pygame.display.update()
 
+
+
 enemies = []
 player = Player(200, H-100, 64, 64)
 pygame.time.set_timer(USEREVENT+1,500)
@@ -161,11 +161,11 @@ speed = 80
 run = True
 previous_time = pygame.time.get_ticks()
 prev_time = pygame.time.get_ticks()
-
-#------------------------------- main loop -------------------------------#
 title_font = pygame.font.SysFont("comicsans", 70)
 instructions_font = pygame.font.SysFont("comicsans", 40)
 run = True
+
+#------------------------------- main loop -------------------------------#
 while run:
     win.blit(bg, (0,0))
     title_label = title_font.render("Press the mouse to begin", 1, (255,255,255))
