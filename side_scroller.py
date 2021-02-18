@@ -4,6 +4,7 @@ from random import randint
 import os
 import sys
 import math
+import time
 
 pygame.init()
 
@@ -24,7 +25,7 @@ RED = (255, 0, 0)
 GREEN = (0,100,0)
 ORANGE = (255,105,0)
 BG_SPEED = 2
-RELOAD = 200
+RELOAD = 500
 bullets = []
 
 #-------------------------------  player  -------------------------------#
@@ -36,7 +37,8 @@ class Player(object):
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
-        self.hp = 10
+        self.max_hp = 2
+        self.hp = self.max_hp
         self.width = width
         self.height = height
         self.hitbox = (self.x , self.y, self.width, self.height)
@@ -55,12 +57,20 @@ class Player(object):
     def draw(self, win, keys_pressed):
         self.handle_movement(keys_pressed)
         win.blit(self.ship, (self.x,self.y))
+        self.healthbar(win)
         # pygame.draw.rect(win, (255,0,0), self.hitbox,2)
     
     def hit(self):
         if self.hp > 0:
             self.hp -= 1
             print ("player hit")
+        
+
+    
+    def healthbar(self, win):
+        pygame.draw.rect(win, (255,0,0), (W/2 - 50, H-12, 100, 10))
+        pygame.draw.rect(win, (0,255,0), (W/2 - 50, H-12, 100 * (self.hp/self.max_hp), 10))
+
 
 
 #-------------------------------   enemy   -------------------------------#
@@ -154,11 +164,14 @@ prev_time = pygame.time.get_ticks()
 
 #------------------------------- main loop -------------------------------#
 title_font = pygame.font.SysFont("comicsans", 70)
+instructions_font = pygame.font.SysFont("comicsans", 40)
 run = True
 while run:
     win.blit(bg, (0,0))
-    title_label = title_font.render("Press the mouse to begin...", 1, (255,255,255))
-    win.blit(title_label, (W/2 - title_label.get_width()/2, 350))
+    title_label = title_font.render("Press the mouse to begin", 1, (255,255,255))
+    instructions_label = instructions_font.render("SPACE to shoot, WASD to move", 1, (255,255,255))
+    win.blit(title_label, (W/2 - title_label.get_width()/2, 100))
+    win.blit(instructions_label, (W/2 - instructions_label.get_width()/2, 170))
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -191,7 +204,6 @@ while run:
                 if keys_pressed[pygame.K_SPACE]:
                     if current_time - previous_time > 150:
                         previous_time = current_time
-                        # bullets.append(projectile(round(player.x + player.width/2), round(player.y + player.height/2), 5, ORANGE, 1))
                         bullets.append(projectile(round(player.x + player.width/2 + 25), round(player.y + player.height/2), -1, RED, 1, BULLET_VEL_PLAYER))
 
                 reload_time = pygame.time.get_ticks()
@@ -220,6 +232,15 @@ while run:
                                 if bullet.x > player.hitbox[0] and bullet.x < player.hitbox[0] + player.hitbox[2]:
                                     bullets.pop(bullets.index(bullet))
                                     player.hit()
+
+                    if player.hp <= 0:
+                        win.blit(bg, (bgX,0))
+                        title_label = title_font.render("Game Over... Don't Get Hit LOL", 1, (255,255,255))
+                        win.blit(title_label, (W/2 - title_label.get_width()/2, 350))
+                        pygame.display.update()
+                        time.sleep(3)
+                        quit()
+
 
                     redrawWindow(bullets)
                     clock.tick(speed)
