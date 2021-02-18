@@ -72,7 +72,7 @@ class Enemy(object):
         self.width = width
         self.height = height
         self.x = W - 100
-        self.y = 100#randint(0 + 100, H - 100)
+        self.y = randint(0 + 100, H - 100)
         self.speed = 0
         self.damage = 1
         self.hp = 3
@@ -136,7 +136,8 @@ def redrawWindow(bullets):
     keys_pressed = pygame.key.get_pressed()
 
     player.draw(win, keys_pressed)
-    enemy.draw(win)
+    for enemy in enemies:
+        enemy.draw(win)
     for bullet in bullets:
         # pygame.draw.rect(win, RED, bullet)
         bullet.draw(win)
@@ -144,9 +145,9 @@ def redrawWindow(bullets):
 
     pygame.display.update()
 
-
+enemies = []
 player = Player(200, H-100, 64, 64)
-enemy = Enemy(50, 36)
+# enemy = Enemy(50, 36)
 pygame.time.set_timer(USEREVENT+1,500)
 speed = 80
 run = True
@@ -166,6 +167,13 @@ while run:
     #         enemy = Enemy(random.randrange(50, WIDTH-100), random.randrange(-1500, -100), random.choice(["red", "blue", "green"]))
     #         enemies.append(enemy)
 
+    if len(enemies) < 3:
+            # level += 1
+            # wave_length += 5
+            
+        enemy = Enemy(50, 36)
+        enemies.append(enemy)
+     
     for event in pygame.event.get():  # Loop through a list of events
         if event.type == pygame.QUIT:  # See if the user clicks the red x 
             run = False    # End the loop
@@ -182,24 +190,27 @@ while run:
             # bullets.append(projectile(round(player.x + player.width/2), round(player.y + player.height/2), 5, ORANGE, 1))
             bullets.append(projectile(round(player.x + player.width/2), round(player.y + player.height/2), -1, RED, 1))
 
-    if abs(enemy.y - player.y) < 50 and enemy.visible:
-        bullets.append(projectile(round(enemy.x + enemy.width/2 - 25), round(enemy.y + enemy.height/2), 5, ORANGE, -1))
-
-    for bullet in bullets:
-        if enemy.visible:
-            if bullet.y < enemy.hitbox[1] + enemy.hitbox[3] and bullet.y > enemy.hitbox[1]:
-                if bullet.x > enemy.hitbox[0] and bullet.x < enemy.hitbox[0] + enemy.hitbox[2]:
-                    bullets.pop(bullets.index(bullet))
-                    enemy.hit()
-                
-        if bullet.x < W and bullet.x > 0:
-            bullet.x += bullet.vel
-        else:
-            bullets.pop(bullets.index(bullet))            
     
-    redrawWindow(bullets)
+    for enemy in enemies:
+        #enemy shoot if player in sights
+        if abs(enemy.y - player.y) < 50 and enemy.visible:
+            bullets.append(projectile(round(enemy.x + enemy.width/2 - 25), round(enemy.y + enemy.height/2), 5, ORANGE, -1))
 
-    clock.tick(speed)
+        for bullet in bullets:
+            if enemy.visible:
+                if bullet.y < enemy.hitbox[1] + enemy.hitbox[3] and bullet.y > enemy.hitbox[1]:
+                    if bullet.x > enemy.hitbox[0] and bullet.x < enemy.hitbox[0] + enemy.hitbox[2]:
+                        bullets.pop(bullets.index(bullet))
+                        enemy.hit()
+                    
+            if bullet.x < W and bullet.x > 0:
+                bullet.x += bullet.vel
+            else:
+                bullets.pop(bullets.index(bullet))            
+        
+        redrawWindow(bullets)
+
+        clock.tick(speed)
 
 # def main_menu():
 #     title_font = pygame.font.SysFont("comicsans", 70)
