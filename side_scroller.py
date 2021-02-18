@@ -115,7 +115,7 @@ class Enemy(object):
     def hit(self):
         if self.hp > 0:
             self.hp -= 1
-        else:
+        if self.hp <= 0:
             self.visible = False
 
 
@@ -227,8 +227,6 @@ while run:
                                 if bullet.x > enemy.hitbox[0] and bullet.x < enemy.hitbox[0] + enemy.hitbox[2]:
                                     bullets.pop(bullets.index(bullet))
                                     enemy.hit()
-                                    if enemy.hp <= 0:
-                                        enemy.visible = False
                         #remove enemy from game if invisible (hp is 0)
                         elif enemy in enemies:      
                             enemies.pop(enemies.index(enemy))
