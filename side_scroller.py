@@ -168,7 +168,7 @@ title_font = pygame.font.SysFont("comicsans", 70)
 instructions_font = pygame.font.SysFont("comicsans", 40)
 run = True
 
-#------------------------------- main loop -------------------------------#
+#------------------------------- menu screen -------------------------------#
 while run:
     win.blit(bg, (0,0))
     title_label = title_font.render("Press the mouse to begin", 1, (255,255,255))
@@ -180,7 +180,7 @@ while run:
         if event.type == pygame.QUIT:
             run = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            #end of menu screen
+            #------------------------------- main loop -------------------------------#
             while run:    
                 clock.tick(speed)
                               
@@ -216,7 +216,7 @@ while run:
                 
                 for enemy in enemies:
                     #enemy shoot if player in sights
-                    if abs(enemy.y - player.y) < 50 and enemy.visible and reload_time - prev_time > RELOAD:
+                    if abs(enemy.y - player.y) < 30 and enemy.visible and reload_time - prev_time > RELOAD:
                         prev_time = reload_time
                         bullets.append(projectile(round(enemy.x + enemy.width/2 - 25), round(enemy.y + enemy.height/2), 5, ORANGE, -1, BULLET_VEL_ENEMY))
 
@@ -229,7 +229,6 @@ while run:
                                     enemy.hit()
                         elif enemy in enemies:      
                             enemies.pop(enemies.index(enemy))
-                            print (len(enemies))
                             enemy_kill = pygame.time.get_ticks()      
 
                         #check if player hit
@@ -241,7 +240,7 @@ while run:
                 #deal with player healthbar
                 if player.hp <= 0:
                     win.blit(bg, (bgX,0))
-                    win.blit(bg2, (bgX2,0))
+                    win.blit(bg, (bgX2,0))
                     pygame.display.update()
                     title_label = title_font.render("Game Over... Don't Get Hit LOL", 1, (255,255,255))
                     win.blit(title_label, (W/2 - title_label.get_width()/2, 350))
@@ -250,12 +249,11 @@ while run:
                     quit()
 
                 for bullet in bullets:
-                    #remove bullet if goes off screen        
+                    #move bullets & remove bullet if goes off screen        
                     if bullet.x < W and bullet.x > 0:
                         bullet.x += bullet.vel
                     else:
-                        bullets.pop(bullets.index(bullet))
-                
+                        bullets.pop(bullets.index(bullet))                
 
                 if len(enemies) < 3 and pygame.time.get_ticks() - enemy_kill > SPAWN_COOLDOWN:
                     enemy = Enemy(50, 36)
