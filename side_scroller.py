@@ -15,19 +15,20 @@ pygame.display.set_caption('Side Scroller')
 bg = pygame.image.load(os.path.join('scroller-game\images','game_background_1.png')).convert()
 bgX = 0
 bgX2 = bg.get_width()
-
 clock = pygame.time.Clock()
 
 VEL = 8
 BULLET_VEL_PLAYER = 13
 BULLET_VEL_ENEMY = 6
-RED = (255, 0, 0)
-GREEN = (0,100,0)
-ORANGE = (255,105,0)
 BG_SPEED = 2
 RELOAD = 500
 SPAWN_COOLDOWN = 2000
 NO_ENEMIES = 3
+
+RED = (255, 0, 0)
+GREEN = (0,100,0)
+ORANGE = (255,105,0)
+
 bullets = []
 
 #-------------------------------  player  -------------------------------#
