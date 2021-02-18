@@ -227,6 +227,7 @@ while run:
                                 if bullet.x > enemy.hitbox[0] and bullet.x < enemy.hitbox[0] + enemy.hitbox[2]:
                                     bullets.pop(bullets.index(bullet))
                                     enemy.hit()
+                        #remove enemy from game if invisible (hp is 0)
                         elif enemy in enemies:      
                             enemies.pop(enemies.index(enemy))
                             enemy_kill = pygame.time.get_ticks()      
@@ -237,7 +238,7 @@ while run:
                                     bullets.pop(bullets.index(bullet))
                                     player.hit()
 
-                #deal with player healthbar
+                #Game over
                 if player.hp <= 0:
                     win.blit(bg, (bgX,0))
                     win.blit(bg, (bgX2,0))
