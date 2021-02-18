@@ -80,10 +80,10 @@ class Enemy(object):
         self.width = width
         self.height = height
         self.x = W - 100
-        self.y = randint(0 + 100, H - 100)
+        self.y = randint(0 + 100, H - 250)
         self.speed = 0
         self.damage = 1
-        self.hp = 3
+        self.hp = 1
         self.vel = 2
         self.drop = None
         self.hitbox = (self.x , self.y, self.width, self.height)
@@ -227,6 +227,8 @@ while run:
                                 if bullet.x > enemy.hitbox[0] and bullet.x < enemy.hitbox[0] + enemy.hitbox[2]:
                                     bullets.pop(bullets.index(bullet))
                                     enemy.hit()
+                                    if enemy.hp <= 0:
+                                        enemy.visible = False
                         #remove enemy from game if invisible (hp is 0)
                         elif enemy in enemies:      
                             enemies.pop(enemies.index(enemy))
