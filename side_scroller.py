@@ -145,6 +145,8 @@ def spawn():
 def redrawWindow(bullets):
     win.blit(bg, (bgX,0))
     win.blit(bg, (bgX2,0))
+    text = font.render('Score: ' + str(score), 1, (0,0,0))
+    win.blit(text, (W - text.get_width() - 50, 10))
     keys_pressed = pygame.key.get_pressed()
     player.draw(win, keys_pressed)
     for enemy in enemies:
@@ -155,7 +157,7 @@ def redrawWindow(bullets):
     pygame.display.update()
 
 
-
+score = 0
 enemies = None
 player = Player(200, H-100, 64, 64)
 pygame.time.set_timer(USEREVENT+1,500)
@@ -164,6 +166,7 @@ run = True
 previous_time = pygame.time.get_ticks()
 enemy_kill = pygame.time.get_ticks()
 prev_time = pygame.time.get_ticks()
+font = pygame.font.SysFont('comicsans', 30, True)
 title_font = pygame.font.SysFont("comicsans", 70)
 instructions_font = pygame.font.SysFont("comicsans", 40)
 run = True
@@ -173,6 +176,7 @@ while run:
     win.blit(bg, (0,0))
     title_label = title_font.render("Press the mouse to begin", 1, (255,255,255))
     instructions_label = instructions_font.render("SPACE to shoot, WASD to move", 1, (255,255,255))
+    text = font.render('Score: ' + str(score), 1, (0,0,0))
     win.blit(title_label, (W/2 - title_label.get_width()/2, 100))
     win.blit(instructions_label, (W/2 - instructions_label.get_width()/2, 170))
     pygame.display.update()
@@ -230,7 +234,8 @@ while run:
                         #remove enemy from game if invisible (hp is 0)
                         elif enemy in enemies:      
                             enemies.pop(enemies.index(enemy))
-                            enemy_kill = pygame.time.get_ticks()      
+                            enemy_kill = pygame.time.get_ticks()    
+                            score += 1  
 
                         #check if player hit
                         if bullet.y < player.hitbox[1] + player.hitbox[3] and bullet.y > player.hitbox[1]:
