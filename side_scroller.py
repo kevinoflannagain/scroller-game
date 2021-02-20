@@ -188,8 +188,9 @@ title_font = pygame.font.SysFont("comicsans", 70)
 instructions_font = pygame.font.SysFont("comicsans", 40)
 run = True
 
-POWERUP_STAGES = [3,4,5,6]
-# POWERUP_STAGES = [3,13,20,25]
+ENEMY_POWERUPS = [10,20,25]
+# POWERUP_STAGES = [3,4,5,6]
+POWERUP_STAGES = [3,13,18,25]
 #------------------------------- menu screen -------------------------------#
 while run:
     win.blit(bg, (0,0))
@@ -304,13 +305,13 @@ while run:
                 if len(enemies) < no_enemies and pygame.time.get_ticks() - enemy_kill > SPAWN_COOLDOWN:
                     enemy = Enemy(50, 36)
                     enemies.append(enemy)
-                    if score > 10:
+                    if score > ENEMY_POWERUPS[0]:
                         no_enemies = 5
                         enemy.hp = 15
-                    if score > 20:
+                    if score > ENEMY_POWERUPS[1]:
                         no_enemies = 9
                         enemy.hp = 15
-                    if score > 21:
+                    if score > ENEMY_POWERUPS[2]:
                         no_enemies = 9
                         enemy.hp = 15
                         RELOAD = 100
