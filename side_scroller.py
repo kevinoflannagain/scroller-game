@@ -153,7 +153,8 @@ class Powerup(object):
 
     def pick_power():
         if self.power == 1:
-            
+            pass
+
 
 
 def spawn():
