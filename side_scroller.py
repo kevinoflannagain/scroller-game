@@ -171,6 +171,7 @@ title_font = pygame.font.SysFont("comicsans", 70)
 instructions_font = pygame.font.SysFont("comicsans", 40)
 run = True
 
+
 #------------------------------- menu screen -------------------------------#
 while run:
     win.blit(bg, (0,0))
