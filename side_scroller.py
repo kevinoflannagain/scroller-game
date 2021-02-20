@@ -151,7 +151,9 @@ class Powerup(object):
         self.hitbox = (self.x , self.y, self.width, self.height)
         self.power = randint
 
-    
+    def pick_power():
+        if self.power == 1:
+            
 
 
 def spawn():
