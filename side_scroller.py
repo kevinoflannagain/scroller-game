@@ -109,7 +109,7 @@ class Enemy(object):
                 self.vel = self.vel * -1
                 
         else:
-            if self.y - self.vel > self.path[1]:
+            if self.y + self.vel > self.path[1]:
                 self.y += self.vel
             else:
                 self.vel = self.vel * -1
