@@ -22,12 +22,14 @@ BULLET_VEL_PLAYER = 13
 BULLET_VEL_ENEMY = 6
 BG_SPEED = 2
 RELOAD = 500
-SPAWN_COOLDOWN = 2000
+SPAWN_COOLDOWN = 1000
 NO_ENEMIES = 3
 
 RED = (255, 0, 0)
 GREEN = (0,100,0)
 ORANGE = (255,105,0)
+WHITE = (255,255,255)
+BLACK = (0,0,0)
 
 bullets = []
 
@@ -107,7 +109,7 @@ class Enemy(object):
                 self.vel = self.vel * -1
                 
         else:
-            if self.y - self.vel > self.path[1]:
+            if self.y + self.vel > self.path[1]:
                 self.y += self.vel
             else:
                 self.vel = self.vel * -1
@@ -119,12 +121,13 @@ class Enemy(object):
             self.visible = False
 
 
-#------------------------------- projectile -------------------------------#
+#------------------------------- projectile -------------------------------# 
 #--------------------------------------------------------------------------#
 class projectile(object):
-    def __init__(self, x, y, radius, color, facing, velocity):
+    def __init__(self, x, y, radius, color, facing, velocity, shape):
         self.x = x
         self.y = y
+        self.shape = shape
         self.radius = radius
         self.color = color
         self.facing = facing
@@ -132,12 +135,27 @@ class projectile(object):
         self.damage = 1
         
     def draw(self,win):
-        if self.radius == -1:
-            bullet_rect = pygame.Rect(self.x, self.y, 10, 5)
-            pygame.draw.rect(win, RED, bullet_rect)
+        if self.shape == "rect":
+            bullet_rect = pygame.Rect(self.x, self.y, 10, self.radius)
+            pygame.draw.rect(win, self.color, bullet_rect)
         else:
             pygame.draw.circle(win, self.color, (self.x,self.y), self.radius)
 #--------------------------------------------------------------------------#
+
+class Powerup(object):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.width = 10
+        self.height = 10
+        self.hitbox = (self.x , self.y, self.width, self.height)
+        self.power = randint
+
+    def pick_power():
+        if self.power == 1:
+            pass
+
+
 
 def spawn():
     pass
@@ -158,11 +176,13 @@ def redrawWindow(bullets):
 
 
 score = 0
+player_reload = 150
 enemies = None
 player = Player(200, H-100, 64, 64)
 pygame.time.set_timer(USEREVENT+1,500)
 speed = 60
 run = True
+no_enemies = 3
 previous_time = pygame.time.get_ticks()
 enemy_kill = pygame.time.get_ticks()
 prev_time = pygame.time.get_ticks()
@@ -172,6 +192,9 @@ instructions_font = pygame.font.SysFont("comicsans", 40)
 run = True
 
 
+ENEMY_POWERUPS = [10,20,25]
+# POWERUP_STAGES = [3,4,5,6]
+POWERUP_STAGES = [3,13,18,25]
 #------------------------------- menu screen -------------------------------#
 while run:
     win.blit(bg, (0,0))
@@ -213,9 +236,30 @@ while run:
                 
                 #deal with player shooting
                 if keys_pressed[pygame.K_SPACE]:
-                    if current_time - previous_time > 150:
+                    if current_time - previous_time > player_reload:
                         previous_time = current_time
-                        bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2), -1, RED, 1, BULLET_VEL_PLAYER))
+                        bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2) - 3, 5, RED, 1, BULLET_VEL_PLAYER, "rect"))
+                        if score == POWERUP_STAGES[0]:
+                            player_reload = 75
+                        if score > POWERUP_STAGES[1]:
+                            player_reload = 50
+                            bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2) + 12, 5, RED, 1, BULLET_VEL_PLAYER, "rect"))
+                            bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2) - 18, 5, RED, 1, BULLET_VEL_PLAYER, "rect"))
+                        if score > POWERUP_STAGES[2]:
+                            bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2) + 12, 5, RED, 1, BULLET_VEL_PLAYER, "rect"))
+                            bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2) - 18, 5, RED, 1, BULLET_VEL_PLAYER, "rect"))
+                            
+                            bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2) + 27, 5, RED, 1, BULLET_VEL_PLAYER, "rect"))
+                            bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2) - 33, 5, RED, 1, BULLET_VEL_PLAYER, "rect"))
+                        if score > POWERUP_STAGES[3]:
+                            bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2) - 3, 5, BLACK, 1, BULLET_VEL_PLAYER, "rect"))
+                            bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2) + 12, 5, BLACK, 1, BULLET_VEL_PLAYER, "rect"))
+                            bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2) - 18, 5, BLACK, 1, BULLET_VEL_PLAYER, "rect"))
+                            
+                            bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2) + 27, 5, BLACK, 1, BULLET_VEL_PLAYER, "rect"))
+                            bullets.append(projectile(round(player.x + player.width/2 + 35), round(player.y + player.height/2) - 33, 5, BLACK, 1, BULLET_VEL_PLAYER, "rect"))
+                            player.damage = 2
+
 
                 reload_time = pygame.time.get_ticks()
                 
@@ -223,7 +267,7 @@ while run:
                     #enemy shoot if player in sights
                     if abs(enemy.y - player.y) < 30 and enemy.visible and reload_time - prev_time > RELOAD:
                         prev_time = reload_time
-                        bullets.append(projectile(round(enemy.x + enemy.width/2 - 25), round(enemy.y + enemy.height/2), 5, ORANGE, -1, BULLET_VEL_ENEMY))
+                        bullets.append(projectile(round(enemy.x + enemy.width/2 - 25), round(enemy.y + enemy.height/2), 5, ORANGE, -1, BULLET_VEL_ENEMY, "circle"))
 
                     for bullet in bullets:
                         #check if enemy hit
@@ -261,8 +305,22 @@ while run:
                         bullet.x += bullet.vel
                     else:
                         bullets.pop(bullets.index(bullet))                
-
-                if len(enemies) < 3 and pygame.time.get_ticks() - enemy_kill > SPAWN_COOLDOWN:
+                #respawn
+                if len(enemies) < no_enemies and pygame.time.get_ticks() - enemy_kill > SPAWN_COOLDOWN:
                     enemy = Enemy(50, 36)
                     enemies.append(enemy)
+                    if score > ENEMY_POWERUPS[0]:
+                        no_enemies = 5
+                        enemy.hp = 15
+                    if score > ENEMY_POWERUPS[1]:
+                        no_enemies = 9
+                        enemy.hp = 15
+                    if score > ENEMY_POWERUPS[2]:
+                        no_enemies = 9
+                        enemy.hp = 15
+                        RELOAD = 100
+                        BULLET_VEL_ENEMY = 10
                 redrawWindow(bullets)
+
+                
+
