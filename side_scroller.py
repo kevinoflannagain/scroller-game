@@ -191,6 +191,7 @@ title_font = pygame.font.SysFont("comicsans", 70)
 instructions_font = pygame.font.SysFont("comicsans", 40)
 run = True
 
+
 ENEMY_POWERUPS = [10,20,25]
 # POWERUP_STAGES = [3,4,5,6]
 POWERUP_STAGES = [3,13,18,25]
